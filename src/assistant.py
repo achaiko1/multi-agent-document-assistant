@@ -54,6 +54,12 @@ class DocumentAssistant:
         # Current session
         self.current_session: Optional[SessionState] = None
 
+
+
+    def upload_pdf(self, file_path: str) -> str:
+        """Register a PDF in the document retrieval system."""
+        return self.retriever.add_pdf(file_path)
+
     def start_session(self, user_id: str, session_id: Optional[str] = None) -> str:
         """Start a new session or resume an existing one."""
         if session_id and self._session_exists(session_id):
