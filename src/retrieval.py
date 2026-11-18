@@ -152,6 +152,40 @@ class SimulatedRetriever:
         """Add a document to the retriever"""
         self.documents[document.doc_id] = document
 
+    
+    def add_pdf(self, file_path: str) -> str:
+        """Extract PDF text and register it for document retrieval."""
+        from pathlib import Path
+        from pdf_ingestion import extract_pdf_text
+
+        path = Path(file_path)
+        pages = extract_pdf_text(str(path))
+
+        if not pages:
+            raise ValueError("PDF contains no extractable text")
+
+        doc_id = f"PDF-{path.stem}"
+
+        content = "\n\n".join(
+            f"[Page {page['page_number']}]\n{page['text']}"
+            for page in pages
+        )
+
+        document = Document(
+            doc_id=doc_id,
+            title=path.name,
+            content=content,
+            doc_type="pdf",
+            metadata={
+                "filename": path.name,
+                "page_count": len(pages),
+            }
+        )
+
+        self.add_document(document)
+        return doc_id
+
+
     def _get_document_amount(self, doc: Document) -> Optional[float]:
         """
         Extract the amount from a document's metadata.

@@ -113,6 +113,21 @@ def main():
                 list_documents(assistant)
                 continue
 
+            elif user_input.lower().startswith("/upload "):
+                file_path = user_input[8:].strip().strip('"')
+
+                try:
+                    doc_id = assistant.upload_pdf(file_path)
+                    print(
+                        f"\nPDF uploaded successfully! Document ID: {doc_id}",
+                        color='green'
+                    )
+                except Exception as e:
+                    print(f"\nUpload failed: {e}", color='red')
+
+                continue
+
+
             # Process the message
             print("\nProcessing...", color='yellow')
             result = assistant.process_message(user_input)
