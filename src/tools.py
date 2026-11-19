@@ -212,6 +212,34 @@ def create_document_search_tool(retriever, logger: ToolLogger):
                     # Default to keyword search
                     results = retriever.retrieve_by_keyword(query)
 
+            # Resolve generic searches when one PDF is uploaded.
+            # A PDF containing an invoice may have doc_type="pdf",
+            # so an invoice type search can otherwise miss it.
+            if not results and len(retriever.documents) == 1:
+                only_doc = next(iter(retriever.documents.values()))
+                query_lower = query.lower()
+
+                is_generic_reference = any(
+                    word in query_lower
+                    for word in ("uploaded", "document", "pdf", "invoice")
+                )
+
+                is_invoice_search = (
+                    doc_type == "invoice"
+                    and "invoice" in only_doc.content.lower()
+                )
+
+                has_amount_filter = any(
+                    value is not None
+                    for value in (comparison, amount, min_amount, max_amount)
+                )
+
+                if not has_amount_filter and (
+                    is_generic_reference or is_invoice_search
+                ):
+                    results = retriever.retrieve_all()
+
+
             # Format results with amount information
             if not results:
                 formatted = "No documents found matching your search criteria."

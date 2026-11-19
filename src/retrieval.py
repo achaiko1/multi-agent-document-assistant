@@ -227,6 +227,25 @@ class SimulatedRetriever:
         """
         Simple keyword-based retrieval
         """
+
+        # Resolve generic references when only one document is loaded.
+        if len(self.documents) == 1:
+            query_text = query.lower()
+
+            generic_references = (
+                "uploaded",
+                "this document",
+                "the document",
+                "this invoice",
+                "the invoice",
+                "my pdf",
+                "this pdf",
+            )
+
+            if any(phrase in query_text for phrase in generic_references):
+                return self.retrieve_all()
+
+
         query_lower = query.lower()
         keywords = query_lower.split()
 
@@ -260,9 +279,30 @@ class SimulatedRetriever:
                     relevance_score=score
                 ))
 
+        
+        # If there's only one document, allow generic questions
+        # to use it even when keyword matching fails.
+        if not results and len(self.documents) == 1:
+            generic_reference = any(
+                phrase in query_lower
+                for phrase in (
+                    "uploaded",
+                    "this document",
+                    "the document",
+                    "this invoice",
+                    "the invoice",
+                    "my pdf",
+                    "this pdf",
+                )
+            )
+
+            if generic_reference:
+                return self.retrieve_all()
+
         # Sort by relevance and return top_k
         results.sort(key=lambda x: x.relevance_score, reverse=True)
         return results[:top_k]
+
 
     def retrieve_by_type(self, doc_type: str) -> List[DocumentChunk]:
         """Retrieve all documents of a specific type"""
