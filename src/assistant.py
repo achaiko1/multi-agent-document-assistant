@@ -11,6 +11,32 @@ from langchain_core.messages import (
 )
 from langchain_openai import ChatOpenAI
 
+from openai import BadRequestError
+
+
+class RetryingChatOpenAI(ChatOpenAI):
+    """Retry a model request once for intermittent structured-output errors."""
+
+    def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+        for attempt in range(2):
+            try:
+                return super()._generate(
+                    messages,
+                    stop=stop,
+                    run_manager=run_manager,
+                    **kwargs
+                )
+            except BadRequestError as exc:
+                error = str(exc)
+
+                retryable = (
+                    "Failed to validate JSON" in error
+                    or "Tool choice is required" in error
+                )
+
+                if not retryable or attempt == 1:
+                    raise
+
 from schemas import SessionState
 from retrieval import SimulatedRetriever
 from tools import get_all_tools, ToolLogger
@@ -36,7 +62,7 @@ class DocumentAssistant:
 
         # Initialize LLM
         
-        self.llm = ChatOpenAI(
+        self.llm = RetryingChatOpenAI(
             api_key=openai_api_key,
             model=model_name,
             temperature=temperature,
@@ -220,9 +246,21 @@ class DocumentAssistant:
                 "actions_taken": final_state.get("actions_taken", []),
                 "summary": final_state.get("conversation_summary", [])
             }
+        
         except Exception as e:
+            error_text = str(e)
+
+            if (
+                "Failed to validate JSON" in error_text
+                or "Tool choice is required" in error_text
+            ):
+                error_text = (
+                    "The AI couldn't complete this request. "
+                    "Please try sending your question again."
+                )
+
             return {
                 "success": False,
-                "error": str(e),
+                "error": error_text,
                 "response": None
             }
