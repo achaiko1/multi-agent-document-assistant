@@ -24,13 +24,16 @@ class DocumentAssistant:
     stores state/session data within a file.
     """
 
+    
     def __init__(
-            self,
-            openai_api_key: str,
-            model_name: str = "gpt-4o",
-            temperature: float = 0.1,
-            session_storage_path: str = "./sessions"
+        self,
+        openai_api_key: str,
+        model_name: str = "gpt-4o",
+        temperature: float = 0.1,
+        session_storage_path: str = "./sessions",
+        load_samples: bool = True
     ):
+
         # Initialize LLM
         self.llm = ChatOpenAI(
             api_key=openai_api_key,
@@ -40,7 +43,7 @@ class DocumentAssistant:
         )
 
         # Initialize components
-        self.retriever = SimulatedRetriever()
+        self.retriever = SimulatedRetriever(load_samples=load_samples)
         self.tool_logger = ToolLogger(logs_dir="./logs")
         self.tools = get_all_tools(self.retriever, self.tool_logger)
 
