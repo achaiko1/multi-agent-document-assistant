@@ -17,6 +17,12 @@ The system uses LLM-based intent classification to dynamically route requests th
 - **Safe Arithmetic Evaluation:** Uses Python's Abstract Syntax Tree (AST) to restrict mathematical operations rather than executing arbitrary Python code.
 - **Execution Logging:** Records tool invocations and results for debugging and observability.
 
+- **Interactive Web Interface:** Streamlit dashboard for document processing and AI-powered conversations.
+- **Dynamic PDF Ingestion:** Extracts and registers text from user-uploaded PDFs using PyMuPDF.
+- **Document Management:** View and remove uploaded documents directly from the web interface.
+- **Automated Testing:** pytest tests covering document initialization, PDF registration, and removal.
+
+
 ## Technology Stack
 
 | Technology | Purpose |
@@ -28,6 +34,9 @@ The system uses LLM-based intent classification to dynamically route requests th
 | Pydantic | Structured outputs and input validation |
 | Python AST | Safe mathematical expression evaluation |
 | JSON | Session history and tool execution logging |
+| Streamlit | Interactive web interface and document management |
+| PyMuPDF | PDF text extraction and ingestion |
+| pytest | Automated testing of document retrieval and ingestion |
 
 ## System Architecture
 
@@ -179,35 +188,78 @@ SESSION_STORAGE_PATH=./sessions
 
 Never commit real API credentials to version control.
 
+
 ### Running the Application
+
+#### Web Interface (Recommended)
+
+Launch the Streamlit application:
+
+```bash
+python -m streamlit run app.py
+```
+
+Open http://localhost:8501 in your browser.
+
+The web interface supports:
+
+- Uploading and processing PDF documents
+- Viewing and removing uploaded documents
+- Asking natural-language questions about document contents
+- Generating document summaries
+- Performing calculations using extracted numerical data
+- Maintaining multi-turn chat history during the active browser session
+- Viewing agent routing decisions and tool usage
+
+Uploaded documents are maintained in memory for the current session.
+
+#### Command-Line Interface
+
+Alternatively, launch the CLI:
 
 ```bash
 python main.py
 ```
 
-The application launches an interactive command-line interface supporting document questions, summaries, calculations, and multi-turn conversations.
+The CLI supports document questions, summarization, calculations, and conversational memory.
 
 Available commands:
 
 - `/help` — Display available commands
-- `/docs` — List sample documents
+- `/docs` — List available documents
+- `/upload <path>` — Upload a local PDF
 - `/quit` — Exit the application
+
+#### Running Automated Tests
+
+Run the test suite:
+
+```bash
+python -m pytest tests/ -v
+```
+
+The automated tests cover empty retriever initialization, PDF registration, and document removal.
 
 ## Project Structure
 
 ```text
 multi-agent-document-assistant/
-├── docs/
-│   └── langgraph_agent_architecture.png
+├── app.py                  # Streamlit web application
+├── main.py                 # Command-line interface
 ├── src/
 │   ├── __init__.py
-│   ├── agent.py
-│   ├── assistant.py
+│   ├── agent.py            # LangGraph workflow
+│   ├── assistant.py        # Main application controller
+│   ├── pdf_ingestion.py    # PDF text extraction
 │   ├── prompts.py
-│   ├── retrieval.py
+│   ├── retrieval.py        # Document storage and retrieval
 │   ├── schemas.py
-│   └── tools.py
-├── main.py
+│   └── tools.py            # Retrieval and calculator tools
+├── tests/
+│   └── test_retrieval.py   # Automated tests
+├── docs/
+│   ├── langgraph_agent_architecture.png
+│   └── test.pdf            # Synthetic test invoice
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -265,21 +317,24 @@ These tests were conducted locally through the command-line application. Automat
 
 ## Current Limitations
 
-The current implementation operates on a simulated document collection containing sample invoices, contracts, and insurance claims.
+The application currently uses keyword-based document retrieval rather than vector embeddings or semantic search.
 
-It does not yet provide general-purpose PDF uploads, vector-based semantic retrieval, or a browser-based interface. The current application is primarily an interactive command-line system.
+PDF ingestion supports text-based PDFs. Scanned documents and image-only PDFs require OCR, which has not yet been implemented.
 
-The in-memory LangGraph checkpoints are not durable across application restarts, although saved conversational messages can be reconstructed from JSON session files.
+Uploaded documents are stored in memory during the active application session and are not persisted across server restarts.
+
+The web interface maintains chat history within the active Streamlit session. Removing a document prevents future retrieval from that document, but information already present in conversation history may still influence subsequent responses.
+
+The application currently uses an Udacity/Vocareum-compatible API endpoint. Public deployment will require independently authorized API credentials and appropriate security controls.
 
 ## Planned Enhancements
 
-- User-uploaded PDF and document processing
-- Text chunking and semantic retrieval
-- Interactive web interface
-- Automated unit and integration tests
-- GitHub Actions continuous integration
-- Deployment of a public demonstration
-- Improved error handling and observability
+- **Semantic Search:** Add text chunking, embeddings, and vector-based document retrieval.
+- **Persistent Storage:** Store uploaded documents and conversation histories across application restarts.
+- **Continuous Integration:** Configure GitHub Actions to run automated tests on every push and pull request.
+- **Public Deployment:** Host the Streamlit application with secure API credential management.
+- **Improved Document Grounding:** Add source citations and stronger safeguards against unsupported answers.
+- **Expanded Document Support:** Add OCR for scanned PDFs and support additional file formats.
 
 ## Project Background
 
