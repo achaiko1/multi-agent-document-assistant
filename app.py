@@ -47,6 +47,18 @@ st.write(
     "and perform calculations using specialized AI agents."
 )
 
+
+
+st.markdown("#### 💡 Try asking about your uploaded document:")
+
+st.markdown("""
+- **Q&A:** "Who is the client, and when is payment due?"
+- **Summarization:** "Summarize the uploaded document and highlight its key details."
+- **Calculation:** "Calculate the total amount due by adding the subtotal and tax."
+- **Combined workflow:** "Summarize the invoice, calculate the total due including tax, and explain the calculation."
+""")
+
+
 with st.sidebar:
     st.header("Documents")
 
