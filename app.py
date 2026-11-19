@@ -49,6 +49,18 @@ st.write(
 
 with st.sidebar:
     st.header("Documents")
+
+    sample_pdf_path = Path(__file__).resolve().parent / "docs" / "test.pdf"
+
+    if sample_pdf_path.exists():
+        st.download_button(
+            label="📥 Download Sample PDF",
+            data=sample_pdf_path.read_bytes(),
+            file_name="sample_invoice.pdf",
+            mime="application/pdf",
+            help="Download a sample invoice to test the AI assistant."
+        )
+
     if "upload_success" in st.session_state:
         st.success(st.session_state.pop("upload_success"))
     st.subheader("Uploaded Documents")
