@@ -20,9 +20,13 @@ class SimulatedRetriever:
     Simulates document retrieval without using vector databases.
     """
 
-    def __init__(self):
+    
+    def __init__(self, load_samples: bool = True):
         self.documents: Dict[str, Document] = {}
-        self._load_sample_documents()
+
+        if load_samples:
+            self._load_sample_documents()
+
 
     def _load_sample_documents(self):
         """Load sample documents into memory"""
