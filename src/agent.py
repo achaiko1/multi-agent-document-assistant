@@ -83,7 +83,12 @@ def classify_intent(state: AgentState, config: RunnableConfig) -> AgentState:
     llm = config.get("configurable").get("llm")
     history = state.get("messages", [])
 
-    structured_llm = llm.with_structured_output(UserIntent)
+    
+    structured_llm = llm.with_structured_output(
+        UserIntent,
+        method="function_calling"
+    )
+
 
     prompt = get_intent_classification_prompt().format(
         user_input=state["user_input"],
@@ -209,7 +214,10 @@ def update_memory(state: AgentState, config: RunnableConfig) -> AgentState:
     })
 
     # Enforce structured output
-    structured_llm = llm.with_structured_output(UpdateMemoryResponse)
+    structured_llm = llm.with_structured_output(
+        UpdateMemoryResponse,
+        method="function_calling"
+    )
 
     # Generate the updated memory
     response = structured_llm.invoke(prompt_with_history)

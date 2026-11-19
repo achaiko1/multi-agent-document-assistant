@@ -113,8 +113,23 @@ for message in st.session_state.chat_history:
         if message.get("tools"):
             st.caption(f"Tools: {', '.join(message['tools'])}")
 
+
+
+# Limit AI requests per browser session
+MAX_REQUESTS = 20
+
+if "request_count" not in st.session_state:
+    st.session_state.request_count = 0
+
 # Handle new user messages
-user_input = st.chat_input("Ask a question about your documents...")
+user_input = st.chat_input(
+    "Ask a question about your documents...",
+    disabled=st.session_state.request_count >= MAX_REQUESTS
+)
+
+
+if st.session_state.request_count >= MAX_REQUESTS:
+    st.warning(f"You've reached the {MAX_REQUESTS}-message limit for this demo.")
 
 if user_input:
     st.session_state.chat_history.append({
@@ -127,6 +142,7 @@ if user_input:
 
     with st.chat_message("assistant"):
         with st.spinner("Analyzing documents..."):
+            st.session_state.request_count += 1
             result = st.session_state.assistant.process_message(user_input)
 
         if result["success"]:
