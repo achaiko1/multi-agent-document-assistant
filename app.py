@@ -1,4 +1,5 @@
 import os
+import re
 from dotenv import load_dotenv
 import sys
 from pathlib import Path
@@ -146,7 +147,23 @@ if user_input:
             result = st.session_state.assistant.process_message(user_input)
 
         if result["success"]:
+            
             response = result.get("response") or "No response generated."
+
+            # Remove leaked internal tool-call syntax
+            response = re.sub(
+                r"【assistant\s+to=[^】]*】",
+                "",
+                response
+            )
+
+            # Convert tool citations into readable source references
+            response = re.sub(
+                r"【(?:document_search|document_reader):([^】]+)】",
+                r"(Source: \1)",
+                response
+            )
+
             intent = result.get("intent")
             tools = result.get("tools_used", [])
 

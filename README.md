@@ -1,5 +1,13 @@
 # Multi-Agent Document Intelligence
 
+
+**[🚀 Try the Live Demo](https://multi-agent-document-intelligence.streamlit.app)**
+
+Upload a PDF, ask questions, generate summaries, and perform calculations using specialized LangGraph agents.
+
+**[View Automated Tests](https://github.com/achaiko1/multi-agent-document-assistant/actions)**
+
+
 **An AI-powered document processing system built with Python, LangGraph, LangChain, and Pydantic.**
 
 Multi-Agent Document Intelligence orchestrates specialized AI agents to retrieve information, answer questions, summarize documents, and perform mathematical calculations on financial and healthcare records.

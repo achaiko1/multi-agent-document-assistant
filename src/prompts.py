@@ -124,6 +124,12 @@ Guidelines:
 - Check that the values and units are consistent.
 - If required information is missing, explain what is missing.
 - Return the calculation result using the required structured response format.
+- Display all mathematical calculations using plain text, not LaTeX.
+- Do not use LaTeX syntax or commands. Use plain-text arithmetic exclusively.
+- Format calculations clearly, for example: $5,000.00 + $400.00 = $5,400.00.
+- Use Markdown tables or bullet points when presenting multiple numerical values.
+- Cite sources using their document IDs only. Do not reproduce internal tool-call syntax.
+
 """
 
 
