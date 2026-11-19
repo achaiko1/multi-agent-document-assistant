@@ -86,7 +86,8 @@ def classify_intent(state: AgentState, config: RunnableConfig) -> AgentState:
     
     structured_llm = llm.with_structured_output(
         UserIntent,
-        method="function_calling"
+        method="json_schema",
+        strict=True
     )
 
 
@@ -216,7 +217,8 @@ def update_memory(state: AgentState, config: RunnableConfig) -> AgentState:
     # Enforce structured output
     structured_llm = llm.with_structured_output(
         UpdateMemoryResponse,
-        method="function_calling"
+        method="json_schema",
+        strict=True
     )
 
     # Generate the updated memory
