@@ -35,11 +35,15 @@ class DocumentAssistant:
     ):
 
         # Initialize LLM
+        
         self.llm = ChatOpenAI(
             api_key=openai_api_key,
             model=model_name,
             temperature=temperature,
-            base_url="https://openai.vocareum.com/v1"
+            base_url=os.getenv(
+                "OPENAI_BASE_URL",
+                "https://openai.vocareum.com/v1"
+            )
         )
 
         # Initialize components

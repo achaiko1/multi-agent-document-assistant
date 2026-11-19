@@ -12,16 +12,24 @@ import streamlit as st
 api_key = os.getenv("OPENAI_API_KEY")
 
 if not api_key:
+    try:
+        api_key = st.secrets["OPENAI_API_KEY"]
+    except (KeyError, FileNotFoundError):
+        api_key = None
+
+if not api_key:
     st.error("OPENAI_API_KEY is missing. Check your .env file.")
     st.stop()
 
 if "assistant" not in st.session_state:
+    
     st.session_state.assistant = DocumentAssistant(
-    openai_api_key=api_key,
-    model_name="gpt-4o",
-    temperature=0.1,
-    load_samples=False
+        openai_api_key=api_key,
+        model_name=os.getenv("MODEL_NAME", "openai/gpt-oss-20b"),
+        temperature=0.1,
+        load_samples=False
     )
+
 
     st.session_state.assistant.start_session("web_user")
 
